@@ -8,6 +8,7 @@ apply plugin: 'yly.plugin'
 
 android {
     compileSdkVersion 28
+
     defaultConfig {
         applicationId "com.yly.gradleandasm"
         minSdkVersion 21
@@ -55,5 +56,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    mockImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
+//    mockImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
+}
+
+task helloTask(type: FreshTask) {
+
 }
