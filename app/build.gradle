@@ -23,21 +23,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
-        ylyBuildType {
+        debug {
 
         }
     }
 
-    flavorDimensions "yly"
-
-    productFlavors {
-        prod {
-            dimension "yly"
-        }
-        mock {
-            dimension "yly"
-        }
-    }
+//    flavorDimensions "yly"
+//
+//    productFlavors {
+//        prod {
+//            dimension "yly"
+//        }
+//        mock {
+//            dimension "yly"
+//        }
+//    }
 //    applicationVariants.all { variant ->
 //        if (variant.buildType.name.equals("debug")) {
 //            if (variant.getFlavorName() == "mock") {
@@ -56,7 +56,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
+//    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
 //    mockImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
 }
 

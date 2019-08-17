@@ -18,14 +18,14 @@ buildscript {
 }
 
 allprojects {
-    afterEvaluate { project ->
-        def android = project.extensions.findByName("android")
-        if (android != null) {
-            println "find android"
-            def defaultConfig = android["defaultConfig"]
-            defaultConfig.buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
-        }
-    }
+//    afterEvaluate { project ->
+//        def android = project.extensions.findByName("android")
+//        if (android != null) {
+//            println "find android"
+//            def defaultConfig = android["defaultConfig"]
+//            defaultConfig.buildConfigField("String", "MODULE_NAME", "\"${project.name}\"")
+//        }
+//    }
 //    project.beforeEvaluate {
 //        println "${project.name} beforeEvaluate "
 //    }

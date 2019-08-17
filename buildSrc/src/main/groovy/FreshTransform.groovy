@@ -1,24 +1,18 @@
-import com.android.build.api.transform.Context
-import com.android.build.api.transform.DirectoryInput
-import com.android.build.api.transform.Format
-import com.android.build.api.transform.JarInput
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInput
-import com.android.build.api.transform.TransformInvocation
-import com.android.build.api.transform.TransformOutputProvider
+import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Sets
+import org.apache.commons.io.FileUtils
+import org.objectweb.asm.*
 
-import java.util.logging.Logger
+import java.util.regex.Pattern
 
 class FreshTransform extends Transform {
 
+    def rRegex = Pattern.compile(".*R.*\\.class\$")
+
     @Override
     String getName() {
-        return "yly"
+        return "freshTransform"
     }
 
     @Override
@@ -40,16 +34,89 @@ class FreshTransform extends Transform {
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
 
+//        // scan all jars
+//        transformInvocation.inputs.jarInputs.each { JarInput jarInput ->
+//            File src = jarInput.file
+//            // rename jar files
+//            def hexName = DigestUtils.md5Hex(jarInput.file.absolutePath)
+//            if (destName.endsWith(".jar")) {
+//                destName = destName.substring(0, destName.length() - 4)
+//            }
+//            String destName = jarInput.name
+//            File dest = transformInvocation.outputProvider.getContentLocation(destName + "_" + hexName, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+//            FileUtils.copyFile(src, dest)
+//        }
+
         transformInvocation.inputs.each { TransformInput input ->
             input.directoryInputs.each { DirectoryInput directoryInput ->
                 File dest = transformInvocation.outputProvider.getContentLocation(directoryInput.name, directoryInput.contentTypes, directoryInput.scopes, Format.DIRECTORY)
-                String root = directoryInput.file.absolutePath
-                println "dest   ${dest.absolutePath}"
-                println "root   ${root.absolutePath}"
+                MyLogger.e("dest   $dest")
                 directoryInput.file.eachFileRecurse { File file ->
-//                    println file.absolutePath
+                    if (file.isFile() && !rRegex.matcher(file.absolutePath) && file.absolutePath.endsWith(".class")) {
+                        //获取所有的.class文件
+                        scanClass(new FileInputStream(file))
+                    }
                 }
+                FileUtils.copyDirectory(directoryInput.file, dest)
             }
         }
+
     }
+
+    static void scanClass(InputStream inputStream) {
+        ClassReader cr = new ClassReader(inputStream)
+        ClassWriter cw = new ClassWriter(cr, 0)
+        MyClassVisitor cv = new MyClassVisitor(Opcodes.ASM6, cw)
+        cr.accept(cv, 0)
+        inputStream.close()
+    }
+
+    static class MyClassVisitor extends ClassVisitor {
+
+        MyClassVisitor(int api, ClassVisitor cv) {
+            super(api, cv)
+        }
+
+        @Override
+        void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+            MyLogger.e("MyClassVisitor    $name")
+            super.visit(version, access, name, signature, superName, interfaces)
+        }
+
+        @Override
+        MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+            MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions)
+            if (name == "testInitData") {
+                mv = new MyMethodVisitor(Opcodes.ASM6, mv)
+            }
+            return mv
+        }
+    }
+
+    static class MyMethodVisitor extends MethodVisitor {
+
+        MyMethodVisitor(int api, MethodVisitor mv) {
+            super(api, mv)
+        }
+
+        @Override
+        void visitInsn(int opcode) {
+
+            if ((opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN)) {
+                mv.visitMethodInsn(Opcodes.INVOKESPECIAL
+                        , "com/yly/gradleandasm/TestJavaClass"
+                        , "initData"
+                        , "()V"
+                        , false)
+            }
+            super.visitInsn(opcode)
+        }
+
+        @Override
+        void visitMaxs(int maxStack, int maxLocals) {
+            super.visitMaxs(maxStack + 4, maxLocals)
+        }
+    }
+
 }
+
