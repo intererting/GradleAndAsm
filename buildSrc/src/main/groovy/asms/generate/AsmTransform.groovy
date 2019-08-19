@@ -189,6 +189,7 @@ class MyMethodVisitor extends MethodVisitor {
                     "isLogin", "()Z", false);
 
             def ifLabel = new Label()
+            def elseLabel = new Label()
             mv.visitJumpInsn(Opcodes.IFEQ, ifLabel)
             //先获取一个java.io.PrintStream对象
             mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
@@ -196,8 +197,18 @@ class MyMethodVisitor extends MethodVisitor {
             mv.visitLdcInsn("if判断成立");
             //执行println方法（执行的是参数为字符串，无返回值的println函数）
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-            mv.visitInsn(Opcodes.RETURN)
+//            mv.visitInsn(Opcodes.RETURN)
+
+            mv.visitJumpInsn(Opcodes.GOTO, elseLabel)
             mv.visitLabel(ifLabel);
+            //先获取一个java.io.PrintStream对象
+            mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+            //将int, float或String型常量值从常量池中推送至栈顶  (此处将message字符串从常量池中推送至栈顶[输出的内容])
+            mv.visitLdcInsn("if判断不成立");
+            //执行println方法（执行的是参数为字符串，无返回值的println函数）
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//            mv.visitInsn(Opcodes.RETURN)
+            mv.visitLabel(elseLabel);
         }
     }
 

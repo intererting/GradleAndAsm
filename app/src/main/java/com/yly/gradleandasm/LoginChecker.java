@@ -16,6 +16,6 @@ public class LoginChecker {
     }
 
     boolean isLogin() {
-        return true;
+        return false;
     }
 }
