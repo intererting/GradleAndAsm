@@ -5,6 +5,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.Sets
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
+import org.gradle.internal.impldep.aQute.bnd.osgi.OpCodes
 import org.objectweb.asm.*
 import utils.MyLogger
 
@@ -179,6 +180,24 @@ class MyMethodVisitor extends MethodVisitor {
             mv.visitLdcInsn("before i got it");
             //执行println方法（执行的是参数为字符串，无返回值的println函数）
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+
+            //添加IF判断
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/yly/gradleandasm/LoginChecker",
+                    "getInstance", "()Lcom/yly/gradleandasm/LoginChecker;", false);
+
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/yly/gradleandasm/LoginChecker",
+                    "isLogin", "()Z", false);
+
+            def ifLabel = new Label()
+            mv.visitJumpInsn(Opcodes.IFEQ, ifLabel)
+            //先获取一个java.io.PrintStream对象
+            mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+            //将int, float或String型常量值从常量池中推送至栈顶  (此处将message字符串从常量池中推送至栈顶[输出的内容])
+            mv.visitLdcInsn("if判断成立");
+            //执行println方法（执行的是参数为字符串，无返回值的println函数）
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+            mv.visitInsn(Opcodes.RETURN)
+            mv.visitLabel(ifLabel);
         }
     }
 
