@@ -2,19 +2,19 @@ package com.yly.gradleandasm
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.yly.manno.NeedLoginCheck
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        TestJavaClass().testInitData()
-        println("xxxxx  ${TestJavaClass.a}")
-        println(TestJavaClass.map["name"])
-    }
+//        println(Template().temp())
+//        println(temp())
 
-    override fun onResume() {
-        super.onResume()
+        goToCoroutinesTest.setOnClickListener @NeedLoginCheck {
+            println("setOnClickListener")
+        }
     }
-
 }

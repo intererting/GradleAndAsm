@@ -3,6 +3,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.Sets
 import org.apache.commons.io.FileUtils
 import org.objectweb.asm.*
+import utils.MyLogger
 
 import java.util.regex.Pattern
 
@@ -65,7 +66,7 @@ class FreshTransform extends Transform {
 
     static void scanClass(InputStream inputStream) {
         ClassReader cr = new ClassReader(inputStream)
-        ClassWriter cw = new ClassWriter(cr, 0)
+        ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
         MyClassVisitor cv = new MyClassVisitor(Opcodes.ASM6, cw)
         cr.accept(cv, 0)
         inputStream.close()
@@ -79,7 +80,6 @@ class FreshTransform extends Transform {
 
         @Override
         void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-            MyLogger.e("MyClassVisitor    $name")
             super.visit(version, access, name, signature, superName, interfaces)
         }
 
