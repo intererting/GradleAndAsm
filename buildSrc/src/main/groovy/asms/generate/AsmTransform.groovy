@@ -3,6 +3,7 @@ package asms.generate
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.Sets
+import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.objectweb.asm.*
@@ -174,30 +175,38 @@ class MyMethodVisitor extends MethodVisitor {
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
 
             //添加IF判断
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/yly/gradleandasm/LoginChecker",
-                    "getInstance", "()Lcom/yly/gradleandasm/LoginChecker;", false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/yly/utils/LoginChecker",
+                    "getInstance", "()Lcom/yly/utils/LoginChecker;", false)
 
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/yly/gradleandasm/LoginChecker",
-                    "isLogin", "()Z", false);
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "com/yly/utils/LoginChecker",
+                    "isLogin", "()Z", false)
 
             def ifLabel = new Label()
             def elseLabel = new Label()
-            mv.visitJumpInsn(Opcodes.IFEQ, ifLabel)
+            mv.visitJumpInsn(Opcodes.IFNE, ifLabel)
             //先获取一个java.io.PrintStream对象
             mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
             //将int, float或String型常量值从常量池中推送至栈顶  (此处将message字符串从常量池中推送至栈顶[输出的内容])
-            mv.visitLdcInsn("if判断成立");
+            mv.visitLdcInsn("未登录")
             //执行println方法（执行的是参数为字符串，无返回值的println函数）
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-            mv.visitJumpInsn(Opcodes.GOTO, elseLabel)
-            mv.visitLabel(ifLabel);
+            //执行未登录操作
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "com/yly/utils/LoginChecker",
+                    "getInstance", "()Lcom/yly/utils/LoginChecker;", false)
+
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "com/yly/utils/LoginChecker",
+                    "unloginCallback", "()V", false)
+//           这个要在iflabel前调用
+//            mv.visitJumpInsn(Opcodes.GOTO, elseLabel)
+            mv.visitInsn(Opcodes.RETURN)
+            mv.visitLabel(ifLabel)
             //先获取一个java.io.PrintStream对象
             mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
             //将int, float或String型常量值从常量池中推送至栈顶  (此处将message字符串从常量池中推送至栈顶[输出的内容])
-            mv.visitLdcInsn("if判断不成立");
+            mv.visitLdcInsn("登录")
             //执行println方法（执行的是参数为字符串，无返回值的println函数）
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-            mv.visitLabel(elseLabel);
+//            mv.visitLabel(elseLabel)
         }
     }
 
