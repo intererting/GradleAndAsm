@@ -1,6 +1,6 @@
 package com.yly.gradleandasm;
 
-import com.yly.manno.NeedLoginCheck;
+import com.yly.asmannotation.NeedLoginCheck;
 
 public class Template {
 

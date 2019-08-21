@@ -1,5 +1,8 @@
 package com.yly.gradleandasm;
 
+import com.yly.asmannotation.LoginCallback;
+
+@LoginCallback
 public class LoginChecker {
 
     private static volatile LoginChecker loginChecker;

@@ -1,1 +1,1 @@
-include ':app', ':buildSrc', ':manno'
+include ':app', ':buildSrc', ':asmprocessor', ':asmannotation'

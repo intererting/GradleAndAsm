@@ -1,8 +1,8 @@
 package com.yly.gradleandasm
 
-import com.yly.manno.NeedLoginCheck
+import com.yly.asmannotation.NeedLoginCheck
 
-//@NeedLoginCheck
-//fun temp() {
-//    println("kotlins temp")
-//}
+@NeedLoginCheck
+fun temp() {
+    println("kotlins temp")
+}

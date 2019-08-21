@@ -5,9 +5,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.Sets
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
-import org.gradle.internal.impldep.aQute.bnd.osgi.OpCodes
 import org.objectweb.asm.*
-import utils.MyLogger
 
 import java.util.regex.Pattern
 
@@ -61,9 +59,7 @@ class AsmTransform extends Transform {
                 directoryInput.file.eachFileRecurse { File file ->
                     if (file.isFile() && !rRegex.matcher(file.absolutePath) && file.absolutePath.endsWith(".class")) {
                         //获取所有的.class文件
-//                        if (file.absolutePath.endsWith("Template.class")) {
                         scanMethod(file)
-//                        }
                     }
                 }
                 // copy to dest
@@ -92,11 +88,7 @@ class AsmTransform extends Transform {
 
         @Override
         MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-            MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions)
-//            if (name == "temp") {
-            mv = new MyMethodVisitor(Opcodes.ASM6, mv)
-//            }
-            return mv
+            return new MyMethodVisitor(Opcodes.ASM6, super.visitMethod(access, name, desc, signature, exceptions))
         }
     }
 
@@ -197,8 +189,6 @@ class MyMethodVisitor extends MethodVisitor {
             mv.visitLdcInsn("if判断成立");
             //执行println方法（执行的是参数为字符串，无返回值的println函数）
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-//            mv.visitInsn(Opcodes.RETURN)
-
             mv.visitJumpInsn(Opcodes.GOTO, elseLabel)
             mv.visitLabel(ifLabel);
             //先获取一个java.io.PrintStream对象
@@ -207,7 +197,6 @@ class MyMethodVisitor extends MethodVisitor {
             mv.visitLdcInsn("if判断不成立");
             //执行println方法（执行的是参数为字符串，无返回值的println函数）
             mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-//            mv.visitInsn(Opcodes.RETURN)
             mv.visitLabel(elseLabel);
         }
     }
@@ -227,7 +216,7 @@ class MyMethodVisitor extends MethodVisitor {
 
     @Override
     AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (desc == 'Lcom/yly/manno/NeedLoginCheck;') {
+        if (desc == 'Lcom/yly/asmannotation/NeedLoginCheck;') {
             needLoginCheck = true
         }
         return super.visitAnnotation(desc, visible)
