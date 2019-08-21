@@ -9,6 +9,6 @@ object LoginCheckUtil : LoginCheckInterface {
     }
 
     override fun appLogined(): Boolean {
-        return false
+        return true
     }
 }
